@@ -810,9 +810,145 @@ ggplot(DF_1 %>% filter(!is.na(grupo_estudio), !is.na(prom_ciclo_pasado)),
 
 ### Objetivo 2:
 
-**Examinar cómo varía la percepción del impacto de las redes sociales sobre la salud mental y el rendimiento académico según el sexo y el ciclo académico.**
+**Examinar cómo varía la autopercepción del impacto de las redes sociales sobre la salud mental y el rendimiento académico según el sexo y el ciclo académico.**
 
-VARIABLES INVOLUCRADAS: sexo , ciclo , concentracion_rendimiento_academico , impactos_redes_salud_mental
+VARIABLES INVOLUCRADAS: sexo , ciclo , concentracion_rendimiento_academico , impacto_redes_salud_mental
+
+# Histograma ciclo
+hist(DF_1$ciclo, main="Distribución de Ciclo Académico", xlab="Ciclo", col="lightblue", breaks=10)
+
+library(ggplot2)
+library(dplyr)
+library(scales)
+
+# Filtrado para evitar NA
+DF_1_filtrado <- DF_1 %>%
+  filter(!is.na(impacto_redes_salud_mental), !is.na(sexo))
+
+# Convertir ordinal a factor con etiquetas
+DF_1_filtrado$impacto_redes_salud_mental <- factor(DF_1_filtrado$impacto_redes_salud_mental,
+                                                    levels = c("1","2","3","4","5"),
+                                                    labels = c("1 = Poco", "2", "3", "4", "5 = Mucho"))
+
+# Gráfico lado a lado para comparar percepciones entre sexos
+ggplot(DF_1_filtrado, aes(x = impacto_redes_salud_mental, fill = sexo)) +
+  geom_bar(position = position_dodge()) +
+  labs(title = "Comparación de percepción del impacto en salud mental según sexo",
+       x = "Nivel de impacto",
+       y = "Cantidad de encuestados",
+       fill = "Sexo") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+#En esta grafica se nos da a entender que los varones tienden percibir a las redes sociales con un mayor impacto en su salud mental,
+
+
+library(ggplot2)
+library(dplyr)
+library(scales)
+
+# Filtrar datos para evitar NA
+DF_1_filtrado <- DF_1 %>%
+  filter(!is.na(afecta_concentracion_rendimiento), !is.na(sexo))
+
+# Convertir variable ordinal a factor con etiquetas claras
+DF_1_filtrado$afecta_concentracion_rendimiento <- factor(DF_1_filtrado$afecta_concentracion_rendimiento,
+                                                        levels = c("1","2","3","4","5"),
+                                                        labels = c("1 = Poco", "2", "3", "4", "5 = Mucho"))
+
+# Gráfico de barras lado a lado para comparación por sexo
+ggplot(DF_1_filtrado, aes(x = afecta_concentracion_rendimiento, fill = sexo)) +
+  geom_bar(position = position_dodge()) +
+  labs(title = "Comparación de percepción del impacto en rendimiento académico según sexo",
+       x = "Nivel de impacto",
+       y = "Cantidad de encuestados",
+       fill = "Sexo") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+#En esta grafica se nos da a entender que los varones tienden percibir a las redes sociales con un mayor impacto en su rendimiento académico,
+
+
+# Tabla de frecuencias de sexo
+sexo_freq <- table(DF_1$sexo)
+# Porcentajes redondeados
+sexo_pct <- round(100 * sexo_freq / sum(sexo_freq), 1)
+
+# Etiquetas combinando categoría, cantidad y porcentaje
+sexo_labels <- paste0(names(sexo_freq), "\n", sexo_freq, " (", sexo_pct, "%)")
+
+# Total de observaciones
+total_obs <- sum(sexo_freq)
+
+# Gráfico de torta con total en el título
+pie(sexo_freq,
+    labels = sexo_labels,
+    main = paste0("Distribución de Sexo (Total: ", total_obs, " observaciones)"),
+    col = c("skyblue", "pink"))
+
+
+####Esto nos indica que del total de los encuestados la mayoria son hombres, asi que tomar que las mujeres y los varones tienden a percibir las redes sociales y su impacto en su salud mental es erronea porque las cantidades no son iguales.
+
+
+
+# Boxplot: Nos permite visualizar si hay diferencias en la distribución del ciclo entre hombres y mujeres.
+boxplot(ciclo ~ sexo, data = DF_1, main = "Distribución de Ciclo por Sexo", xlab = "Sexo", ylab = "Ciclo", col = "lightblue")
+
+library(ggplot2)
+library(dplyr)
+
+# Primero, filtramos para eliminar NA en las variables ordinales
+DF_1_filtrado <- DF_1 %>%
+  filter(!is.na(impacto_redes_salud_mental),
+         !is.na(afecta_concentracion_rendimiento))
+
+# Definir paleta de 5 colores
+paleta_colores <- c("#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854")  # 5 colores
+
+# Etiquetas para la escala ordinal
+etiquetas_impacto <- c("1 = Poco", "2", "3", "4", "5 = Mucho")
+
+
+
+##Aqui nos indica que tenemos encuestados de todos los ciclos y una mayor densidad en los ciclos 5 y 7 en el caso de mujeres y 3 y 6 en el caso de varones,
+
+# Gráfico Impacto en salud mental vs Sexo
+ggplot(DF_1_filtrado, aes(x = sexo, fill = factor(impacto_redes_salud_mental))) +
+  geom_bar(position = "fill") +
+  scale_fill_manual(values = paleta_colores,
+                    name = "Impacto en salud mental",
+                    labels = etiquetas_impacto) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(title = "Impacto percibido en salud mental según sexo",
+       x = "Sexo",
+       y = "Proporción") +
+  theme_minimal()
+
+Podemos observar que la proporción de la percepción del impacto de las redes sociales en la salud mental es similar entre hombres y mujeres, lo que indica que esta percepción no varía significativamente según el sexo del encuestado. Sin embargo, se destaca que, en general, los participantes tienden a percibir un impacto moderado a alto, ubicándose mayormente en niveles 3 y 4 de la escala de percepción.
+
+# Gráfico Impacto en rendimiento académico vs Sexo
+ggplot(DF_1_filtrado, aes(x = sexo, fill = factor(afecta_concentracion_rendimiento))) +
+  geom_bar(position = "fill") +
+  scale_fill_manual(values = paleta_colores,
+                    name = "Impacto en rendimiento académico",
+                    labels = etiquetas_impacto) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(title = "Impacto percibido en rendimiento académico según sexo",
+       x = "Sexo",
+       y = "Proporción") +
+  theme_minimal()
+La percepción del impacto de las redes sociales en el rendimiento académico es similar entre hombres y mujeres, mostrando proporciones comparables en ambos grupos. No obstante, se observa una ligera tendencia hacia una mayor percepción en el nivel máximo (5), lo que indica que algunos encuestados consideran que el efecto en su rendimiento es muy significativo.
+
+
+##Al analizar la percepción sobre el rendimiento académico, se evidencia que hombres y mujeres presentan diferencias en sus percepciones. Esta disparidad, en primera instancia, puede estar influenciada por la composición del grupo encuestado. Respecto a la distribución por ciclo académico, se observa que la mayoría de los participantes son hombres, concentrados principalmente en los ciclos 3 y 6, mientras que las mujeres se concentran en los ciclos 3 y 7. Esta desigualdad en la cantidad de encuestados por sexo indica que un análisis basado únicamente en el número absoluto de hombres y mujeres podría ser engañoso, ya que las proporciones no son equivalentes.
+
+##Podemos observar que la percepción del impacto de las redes sociales en la salud mental es bastante similar entre hombres y mujeres, indicando que el sexo no influye significativamente en cómo se percibe este efecto. En general, los participantes tienden a ubicar su percepción en niveles moderados a altos (principalmente en los niveles 3 y 4), reflejando un reconocimiento generalizado del impacto que las redes sociales tienen en la salud mental.
+
+"En cuanto al rendimiento académico, la percepción también es comparable entre ambos sexos, aunque con una ligera inclinación hacia la percepción máxima (nivel 5) por parte de algunos encuestados, lo que sugiere que una parte de la muestra considera que las redes sociales afectan mucho su rendimiento.
+
+
+
+#
 
 ### Objetivo 3 ##ARREGLAR TODO SANTIAGO
 
